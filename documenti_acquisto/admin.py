@@ -1,13 +1,15 @@
 from django.contrib import admin
 from documenti_acquisto.models import *
+from documenti_acquisto.views import converti
 from mptt.admin import MPTTModelAdmin
 from django.conf.urls import patterns, include, url
 from django.utils.translation import ugettext_lazy as _
 import datetime as dt
 from import_export.admin import ImportExportModelAdmin
-# Create your views here.
+from django.shortcuts import render_to_response
 
 admin.site.register(Fornitore)
+admin.site.register(Articolo)
 
 
 class ScadenzeListFilter(admin.SimpleListFilter):
@@ -42,10 +44,29 @@ class ScadenzeListFilter(admin.SimpleListFilter):
         if self.value() == 'scadenze':
             return queryset.filter(data_scadenza__month=oggi.month)
 
+class BeniInline(admin.TabularInline):
+    model = Bene
+
+from suit.widgets import SuitDateWidget
+
+class scadenza_form(forms.Form):
+    scadenza = forms.DateField('Data di scadenza')
+    class Meta:
+        widgets = {
+            'scadenza': SuitDateWidget,
+        }
+
+def convert_fattura(modeladmin, request, queryset):
+    convert_fattura.short_description = "Converti in fattura"
+    return render_to_response('admin/converti_fattura.html',{'request':request, 'queryset': queryset , 'scadenza_form': scadenza_form})
+
+
 class Fattura_acquistoAdmin(ImportExportModelAdmin):
     date_hierarchy = 'data_scadenza'
     list_display = ('fornitore', 'data_scadenza', 'importo')
-    #list_filter = (ScadenzeListFilter,)
+    inlines = [
+        BeniInline,
+    ]
     ordering = ['-data_scadenza']
     def suit_row_attributes(self, obj, request):
         oggi = dt.date.today()
@@ -53,3 +74,26 @@ class Fattura_acquistoAdmin(ImportExportModelAdmin):
          return {'class': 'error'}
 
 admin.site.register(Fattura_acquisto, Fattura_acquistoAdmin)
+from django.utils.safestring import mark_safe
+
+def button(obj):
+        if not obj.convertito:
+            return mark_safe('<a href="converti/'+str(obj.id)+'"><input type="button" value="Converti"></a>')
+        return ""
+
+
+class Documento_trasportoAdmin(ImportExportModelAdmin):
+    date_hierarchy = 'data_emissione'
+    list_display = ('fornitore', 'data_emissione', 'importo', button)
+    inlines = [
+        BeniInline,
+    ]
+    actions = [convert_fattura]
+    def get_urls(self):
+        urls = super(Documento_trasportoAdmin, self).get_urls()
+        my_urls = patterns('',
+            (r'^converti/(?P<ddt_id>\w+)/$', converti)
+        )
+        return my_urls + urls
+
+admin.site.register(Documento_trasporto, Documento_trasportoAdmin)
