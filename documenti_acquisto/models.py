@@ -55,7 +55,6 @@ class Bene(models.Model):
         return u'%s x %s' % (self.articolo,self.quantita)
 
 
-
 class Documento_trasporto(Documento_acquisto):
     convertito = models.BooleanField(default=False)
     class Meta:

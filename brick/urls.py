@@ -13,3 +13,8 @@ urlpatterns = patterns('',
 urlpatterns += patterns('ore.views',
 	(r'^dipendenti/', 'list_dipendenti'),
 	)
+
+urlpatterns += patterns('',
+    # Other patterns go here
+    (r'^selectable/', include('selectable.urls')),
+)
