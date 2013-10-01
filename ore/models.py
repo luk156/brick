@@ -7,10 +7,10 @@ from django.contrib.admin import widgets
 
 class Cliente(models.Model):
 	nome = models.TextField('Nome', max_length=30)
-	cognome = models.TextField('Cognome', max_length=30)
-	mail = models.EmailField('E-Mail')
-	telefono = models.IntegerField('Telefono principale')
-	indirizzo = models.TextField('Indirizzo', max_length=100)
+	cognome = models.TextField('Cognome', max_length=, null=True, blank=True)
+	mail = models.EmailField('E-Mail', null=True, blank=True)
+	telefono = models.IntegerField('Telefono principale', null=True, blank=True)
+	indirizzo = models.TextField('Indirizzo', max_length=100, null=True, blank=True)
 	def __unicode__(self):
 		return u'%s %s' % (self.nome, self.cognome)
 	class Meta:
@@ -19,7 +19,7 @@ class Cliente(models.Model):
 
 class Cantiere(models.Model):
 	descrizione = models.TextField('Descrizione', max_length=100)
-	indirizzo = models.TextField('Indirizzo', max_length=100)
+	indirizzo = models.TextField('Indirizzo', max_length=100, null=True, blank=True)
 	cliente = models.ForeignKey(Cliente, related_name='cliente_cantiere')
 	def __unicode__(self):
 		return u'%s' % (self.descrizione)
@@ -78,13 +78,3 @@ class Scheda_lavoroForm(forms.ModelForm):
 		widgets = {
 			#'data': SuitDateWidget,
 		}
-
-class Scheda_materiale(models.Model):
-	importo = models.FloatField('Importo')
-	cantiere = models.ForeignKey(Cantiere, related_name='cantiere_materiale')
-	data = models.DateField()
-	def __unicode__(self):
-		return u'%s ( %s ) - %s' % (self.id, self.importo, self.data)
-	class Meta:
-		verbose_name = "Scheda materiale"
-		verbose_name_plural = "Schede materiale"
