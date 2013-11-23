@@ -9,9 +9,9 @@ from django.conf.urls import patterns, include, url
 admin.site.register(Cliente)
 admin.site.register(Cantiere)
 admin.site.register(Dipendente)
-admin.site.register(Mansione)
+admin.site.register(Attivita)
 
-admin.site.register(Categoria_mansione,MPTTModelAdmin)
+admin.site.register(Categoria_attivita,MPTTModelAdmin)
 
 class slAdmin(admin.ModelAdmin):
     list_filter = ('dipendente', 'cantiere',)

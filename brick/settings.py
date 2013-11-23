@@ -128,8 +128,10 @@ INSTALLED_APPS = (
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
-    'ore',
     'documenti_acquisto',
+    'preventivi',
+    'ore',
+    'nested_inlines',
     'suit',
     'django.contrib.admin',
     'mptt',
